@@ -1,0 +1,18 @@
+name: Martin Luk Daily Screener
+on:
+  schedule:
+    - cron: '30 21 * * 1-5'
+  workflow_dispatch:
+jobs:
+  run-screener:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - run: pip install yfinance pandas numpy requests
+      - env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python martin_luk_screener.py
