@@ -18,53 +18,78 @@ def get_full_us_watchlist():
     try:
         url = "ftp://ftp.nasdaqtrader.com/SymbolDirectory/nasdaqtraded.txt"
         df = pd.read_csv(url, sep='|')
-        valid_stocks = df[df['Test Issue'] == 'N']
+        # Filter for real stocks (Test Issue 'N'), and ensure they are primary equities (usually 1-4 chars, no special suffixes)
+        valid_stocks = df[(df['Test Issue'] == 'N') & (df['ETF'] == 'N')]
         tickers = valid_stocks['Symbol'].dropna().tolist()
-        tickers = [str(t).replace('.','-') for t in tickers if " " not in str(t)]
-        return tickers
+        
+        # Clean symbols: remove warrants (-W), preferred ($), units (-U), etc.
+        # Yahoo Finance uses '-' instead of '.' for some classes
+        cleaned_tickers = []
+        for t in tickers:
+            t = str(t).strip()
+            if "$" in t or "-" in t or "." in t or len(t) > 4:
+                continue # Skip non-standard common stocks to avoid 404s
+            cleaned_tickers.append(t)
+            
+        return list(set(cleaned_tickers)) # Remove duplicates
     except Exception as e:
         print(f"Error fetching watchlist: {e}")
-        return ["NVDA", "TSLA", "PLTR", "AMD", "MSTR"]
+        return ["NVDA", "TSLA", "PLTR", "AMD", "MSTR", "AAPL", "MSFT", "AMZN", "GOOGL", "META"]
 
 def screen_martin_luk_pullbacks(tickers):
     matched_stocks = []
     print(f"[{datetime.datetime.now()}] Downloading data for {len(tickers)} tickers...")
-    data = yf.download(tickers, period="6mo", progress=False, group_by='ticker')
-
-    for ticker in tickers:
+    
+    # Process in batches to handle yfinance overhead and avoid massive 404 spam
+    batch_size = 100
+    for i in range(0, len(tickers), batch_size):
+        batch = tickers[i:i+batch_size]
         try:
-            df = data[ticker].dropna()
-            if len(df) < 50: continue
+            data = yf.download(batch, period="7mo", progress=False, group_by='ticker', threads=True)
             
-            df['EMA9'] = df['Close'].ewm(span=9, adjust=False).mean()
-            df['EMA21'] = df['Close'].ewm(span=21, adjust=False).mean()
-            df['EMA50'] = df['Close'].ewm(span=50, adjust=False).mean()
-            df['DollarVolume'] = (df['Close'] * df['Volume']).rolling(window=20).mean()
-            df['ADR'] = calculate_adr(df['High'], df['Low'], period=20)
+            for ticker in batch:
+                try:
+                    if ticker not in data: continue
+                    df = data[ticker].dropna()
+                    if len(df) < 60: continue
+                    
+                    # Technical Indicators
+                    df['EMA9'] = df['Close'].ewm(span=9, adjust=False).mean()
+                    df['EMA21'] = df['Close'].ewm(span=21, adjust=False).mean()
+                    df['EMA50'] = df['Close'].ewm(span=50, adjust=False).mean()
+                    df['DollarVolume'] = (df['Close'] * df['Volume']).rolling(window=20).mean()
+                    df['ADR'] = calculate_adr(df['High'], df['Low'], period=20)
+                    
+                    latest = df.iloc[-1]
+                    prev = df.iloc[-2]
+                    current_price = latest['Close']
+                    
+                    # Martin Luk Criteria: High Dollar Volume (>10M) and High Volatility (ADR > 4%)
+                    if latest['DollarVolume'] < 10_000_000 or latest['ADR'] < 4.0: continue
+                    
+                    # Trend Confirmation
+                    is_uptrend = (current_price > latest['EMA50']) and \
+                                 (latest['EMA9'] > latest['EMA21']) and \
+                                 (latest['EMA21'] > prev['EMA21'])
+                    if not is_uptrend: continue
+                    
+                    # Support/Pullback check (within 3% of EMA 9 or EMA 21)
+                    dist_to_ema9 = abs(current_price - latest['EMA9']) / latest['EMA9']
+                    dist_to_ema21 = abs(current_price - latest['EMA21']) / latest['EMA21']
+                    
+                    if dist_to_ema9 <= 0.03 or dist_to_ema21 <= 0.03:
+                        matched_stocks.append({
+                            'Ticker': ticker,
+                            'Price': round(float(current_price), 2),
+                            'ADR': round(float(latest['ADR']), 2),
+                            'Support': 'EMA 9' if dist_to_ema9 <= 0.03 else 'EMA 21',
+                            'Dist': round(min(dist_to_ema9, dist_to_ema21) * 100, 2)
+                        })
+                except Exception:
+                    continue
+        except Exception as e:
+            print(f"Batch processing error: {e}")
             
-            latest = df.iloc[-1]
-            prev = df.iloc[-2]
-            current_price = latest['Close']
-            
-            if latest['DollarVolume'] < 10_000_000 or latest['ADR'] < 4.0: continue
-            
-            is_uptrend = (current_price > latest['EMA50']) and \
-                         (latest['EMA9'] > latest['EMA21']) and \
-                         (latest['EMA21'] > prev['EMA21'])
-            if not is_uptrend: continue
-            
-            dist_to_ema9 = abs(current_price - latest['EMA9']) / latest['EMA9']
-            dist_to_ema21 = abs(current_price - latest['EMA21']) / latest['EMA21']
-            
-            if dist_to_ema9 <= 0.03 or dist_to_ema21 <= 0.03:
-                matched_stocks.append({
-                    'Ticker': ticker,
-                    'Price': round(current_price, 2),
-                    'ADR': round(latest['ADR'], 2),
-                    'Support': 'EMA 9' if dist_to_ema9 <= 0.03 else 'EMA 21',
-                    'Dist': round(min(dist_to_ema9, dist_to_ema21) * 100, 2)
-                })
-        except: continue
     return pd.DataFrame(matched_stocks)
 
 
