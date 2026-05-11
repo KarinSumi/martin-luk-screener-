@@ -6,6 +6,8 @@ import warnings
 import urllib.request
 import requests
 import os
+import time
+import random
 
 warnings.filterwarnings('ignore')
 
@@ -16,41 +18,48 @@ def calculate_adr(high_series, low_series, period=20):
 def get_full_us_watchlist():
     print(f"[{datetime.datetime.now()}] Fetching full US stock universe...")
     try:
-        url = "ftp://ftp.nasdaqtrader.com/SymbolDirectory/nasdaqtraded.txt"
+        url = "http://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
         df = pd.read_csv(url, sep='|')
-        # Filter for real stocks (Test Issue 'N'), and ensure they are primary equities (usually 1-4 chars, no special suffixes)
-        valid_stocks = df[(df['Test Issue'] == 'N') & (df['ETF'] == 'N')]
-        tickers = valid_stocks['Symbol'].dropna().tolist()
+        # Filter for real stocks (Test Issue 'N'), and ensure they are not ETFs
+        valid_stocks = df[(df['Test Issue'] == 'N') & (df['ETF'] == 'N')].copy()
         
-        # Clean symbols: remove warrants (-W), preferred ($), units (-U), etc.
-        # Yahoo Finance uses '-' instead of '.' for some classes
-        cleaned_tickers = []
-        for t in tickers:
-            t = str(t).strip()
-            if "$" in t or "-" in t or "." in t or len(t) > 4:
-                continue # Skip non-standard common stocks to avoid 404s
-            cleaned_tickers.append(t)
-            
-        return list(set(cleaned_tickers)) # Remove duplicates
+        # Vectorized cleaning: exclude any ticker containing $, -, or . and ensure length <= 4
+        # We use str.contains with regex to catch $, -, and .
+        mask = ~valid_stocks['Symbol'].str.contains(r'[\$\-\.]', na=True)
+        valid_stocks = valid_stocks[mask]
+        valid_stocks = valid_stocks[valid_stocks['Symbol'].str.len() <= 4]
+        
+        tickers = valid_stocks['Symbol'].dropna().unique().tolist()
+        print(f"[{datetime.datetime.now()}] Watchlist ready: {len(tickers)} tickers.")
+        return tickers
     except Exception as e:
         print(f"Error fetching watchlist: {e}")
+        # Robust fallback
         return ["NVDA", "TSLA", "PLTR", "AMD", "MSTR", "AAPL", "MSFT", "AMZN", "GOOGL", "META"]
 
 def screen_martin_luk_pullbacks(tickers):
     matched_stocks = []
     print(f"[{datetime.datetime.now()}] Downloading data for {len(tickers)} tickers...")
     
-    # Process in batches to handle yfinance overhead and avoid massive 404 spam
-    batch_size = 100
+    # Process in batches of 250
+    batch_size = 250
     for i in range(0, len(tickers), batch_size):
         batch = tickers[i:i+batch_size]
+        print(f"[{datetime.datetime.now()}] Processing batch {i//batch_size + 1}/{(len(tickers)-1)//batch_size + 1} ({len(batch)} tickers)...")
+        
         try:
+            # period="7mo" to ensure we have enough data for 50-day EMA and 20-day rolling volume/ADR
             data = yf.download(batch, period="7mo", progress=False, group_by='ticker', threads=True)
             
+            # Detect potential rate limits/empty returns
+            if data.empty and len(batch) > 0:
+                raise Exception("Empty data returned from yfinance. Potential rate limit.")
+
             for ticker in batch:
                 try:
-                    if ticker not in data: continue
+                    if ticker not in data or data[ticker].empty: continue
                     df = data[ticker].dropna()
+                    # Need at least 60 days for 50-day EMA + some lookback
                     if len(df) < 60: continue
                     
                     # Technical Indicators
@@ -64,16 +73,19 @@ def screen_martin_luk_pullbacks(tickers):
                     prev = df.iloc[-2]
                     current_price = latest['Close']
                     
-                    # Martin Luk Criteria: High Dollar Volume (>10M) and High Volatility (ADR > 4%)
-                    if latest['DollarVolume'] < 10_000_000 or latest['ADR'] < 4.0: continue
+                    # 1. Volume Filter (Priority C)
+                    if latest['DollarVolume'] < 10_000_000: continue
                     
-                    # Trend Confirmation
+                    # 2. Trend Filter (Priority B)
                     is_uptrend = (current_price > latest['EMA50']) and \
                                  (latest['EMA9'] > latest['EMA21']) and \
                                  (latest['EMA21'] > prev['EMA21'])
                     if not is_uptrend: continue
                     
-                    # Support/Pullback check (within 3% of EMA 9 or EMA 21)
+                    # 3. Volatility Filter (Priority A)
+                    if latest['ADR'] < 4.0: continue
+                    
+                    # 4. Proximity Filter (Priority D)
                     dist_to_ema9 = abs(current_price - latest['EMA9']) / latest['EMA9']
                     dist_to_ema21 = abs(current_price - latest['EMA21']) / latest['EMA21']
                     
@@ -87,8 +99,19 @@ def screen_martin_luk_pullbacks(tickers):
                         })
                 except Exception:
                     continue
+            
+            # Normal completion of batch: brief random pause
+            delay = random.uniform(10, 20)
+            print(f"Batch completed. Sleeping {delay:.1f}s...")
+            time.sleep(delay)
+
         except Exception as e:
-            print(f"Batch processing error: {e}")
+            print(f"CRITICAL: Batch failed or rate limited: {e}")
+            # Escalated random backoff: 60-180 seconds
+            backoff = random.uniform(60, 180)
+            print(f"Backing off for {backoff:.1f}s...")
+            time.sleep(backoff)
+            # We don't retry here to keep it simple, but we could in a more advanced version
             
     return pd.DataFrame(matched_stocks)
 
@@ -96,14 +119,18 @@ def screen_martin_luk_pullbacks(tickers):
 def send_telegram_message(bot_token, chat_id, message):
     url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
     payload = {"chat_id": chat_id, "text": message, "parse_mode": "HTML"}
-    requests.post(url, json=payload)
+    try:
+        requests.post(url, json=payload, timeout=10)
+    except Exception as e:
+        print(f"Error sending Telegram message: {e}")
 
 if __name__ == "__main__":
-    BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "8779755957:AAG_54Z21eVmQwLmY589eejU6F8GW7__bFQ")
+    # Access keys from environment exclusively for security
+    BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
     CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID")
 
-    if not CHAT_ID:
-        print("Error: TELEGRAM_CHAT_ID environment variable is not set.")
+    if not BOT_TOKEN or not CHAT_ID:
+        print("Error: TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID environment variables are not set.")
     else:
         results = screen_martin_luk_pullbacks(get_full_us_watchlist())
 
