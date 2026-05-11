@@ -136,11 +136,23 @@ if __name__ == "__main__":
 
         if not results.empty:
             results = results.sort_values(by='ADR', ascending=False)
-            msg = "🎯 <b>MARTIN LUK PULLBACKS</b> 🎯\n\n"
+            
+            # Create a text-based table for Telegram (Monospace)
+            header = "TICKER | PRICE | ADR% | SUPP | DIST%"
+            separator = "-" * len(header)
+            table_lines = [header, separator]
+            
             for _, row in results.iterrows():
-                msg += f"🔹 <b>{row['Ticker']}</b>: ${row['Price']}\n"
-                msg += f"   • Support: {row['Support']} ({row['Dist']}%)\n"
-                msg += f"   • ADR: {row['ADR']}%\n\n"
+                # Format each row to fit fixed-width columns
+                ticker = f"{row['Ticker']:<6}"
+                price = f"{row['Price']:>7.2f}"
+                adr = f"{row['ADR']:>5.1f}"
+                supp = f"{'E9' if row['Support'] == 'EMA 9' else 'E21':<4}"
+                dist = f"{row['Dist']:>5.1f}"
+                table_lines.append(f"{ticker} | {price} | {adr} | {supp} | {dist}")
+            
+            table_text = "\n".join(table_lines)
+            msg = f"🎯 <b>MARTIN LUK PULLBACKS</b> 🎯\n\n<pre>{table_text}</pre>"
             send_telegram_message(BOT_TOKEN, CHAT_ID, msg)
         else:
             send_telegram_message(BOT_TOKEN, CHAT_ID, "😴 No setups found today.")
