@@ -56,7 +56,6 @@ def run_multi_screener(tickers):
                     prev = df.iloc[-2]
                     current_price = float(latest['Close'])
                     prev_price = float(prev['Close'])
-                    dollar_vol = latest['Close'] * latest['Volume']
                     
                     # Common Indicators
                     df['EMA9'] = df['Close'].ewm(span=9, adjust=False).mean()
@@ -69,7 +68,6 @@ def run_multi_screener(tickers):
                     p = df.iloc[-2]
                     
                     # logic 1: Martin Luk Pullback
-                    # Volume > 10M, ADR > 4, Trend Up, Near EMA9/21
                     is_uptrend = (current_price > l['EMA50']) and (l['EMA9'] > l['EMA21']) and (l['EMA21'] > p['EMA21'])
                     if l['DollarVolume20'] >= 10_000_000 and l['ADR'] >= 4.0 and is_uptrend:
                         dist_to_ema9 = abs(current_price - l['EMA9']) / l['EMA9']
@@ -83,7 +81,6 @@ def run_multi_screener(tickers):
                             })
 
                     # logic 2: Big Move (>5%)
-                    # Price > 5, Gain > 5%, Dollar Vol > 1M
                     gain = (current_price / prev_price) - 1
                     if current_price >= 5.0 and gain >= 0.05 and l['DollarVolume20'] >= 1_000_000:
                         big_moves.append({
@@ -93,8 +90,7 @@ def run_multi_screener(tickers):
 
                 except Exception: continue
             
-            delay = random.uniform(10, 20)
-            time.sleep(delay)
+            time.sleep(random.uniform(10, 20))
 
         except Exception as e:
             print(f"CRITICAL: Batch failed: {e}")
@@ -106,9 +102,10 @@ def send_telegram_message(bot_token, chat_id, message):
     url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
     payload = {"chat_id": chat_id, "text": message, "parse_mode": "HTML"}
     try:
-        response = requests.post(url, json=payload, timeout=10)
+        response = requests.post(url, json=payload, timeout=15)
         result = response.json()
         if not result.get("ok"): print(f"Telegram Error: {result.get('description')}")
+        else: print("Telegram message sent.")
     except Exception as e: print(f"Error sending message: {e}")
 
 def format_table(title, df, columns, headers):
@@ -129,37 +126,46 @@ if __name__ == "__main__":
     if not BOT_TOKEN or not CHAT_ID:
         print("Missing Credentials.")
     else:
-        pb_df, bm_df = run_multi_screener(get_full_us_watchlist())
+        # 1. Send "Started" heartbeat
+        start_time = datetime.datetime.now()
+        send_telegram_message(BOT_TOKEN, CHAT_ID, f"🚀 <b>Screener Started</b>\nTime: {start_time.strftime('%Y-%m-%d %H:%M:%S')} UTC")
         
-        # Prepare content
-        all_content = []
-        if not pb_df.empty:
-            pb_df = pb_df.sort_values(by='ADR', ascending=False)
-            cols = [('Ticker', 6), ('Price', 7), ('ADR', 4), ('Support', 4), ('Dist', 4)]
-            all_content.append(format_table("🎯 PULLBACKS", pb_df, cols, "TICKER | PRICE   | ADR | SUPP | DIST"))
+        try:
+            tickers = get_full_us_watchlist()
+            num_tickers = len(tickers)
             
-        if not bm_df.empty:
-            bm_df = bm_df.sort_values(by='Gain', ascending=False)
-            cols = [('Ticker', 6), ('Price', 7), ('Gain', 5), ('Vol', 5)]
-            all_content.append(format_table("🚀 BIG MOVES", bm_df, cols, "TICKER | PRICE   | GAIN% | VOL M"))
+            pb_df, bm_df = run_multi_screener(tickers)
+            
+            # Prepare content
+            all_content = []
+            if not pb_df.empty:
+                pb_df = pb_df.sort_values(by='ADR', ascending=False)
+                cols = [('Ticker', 6), ('Price', 7), ('ADR', 4), ('Support', 4), ('Dist', 4)]
+                all_content.append(format_table("🎯 PULLBACKS", pb_df, cols, "TICKER | PRICE   | ADR | SUPP | DIST"))
+                
+            if not bm_df.empty:
+                bm_df = bm_df.sort_values(by='Gain', ascending=False)
+                cols = [('Ticker', 6), ('Price', 7), ('Gain', 5), ('Vol', 5)]
+                all_content.append(format_table("🚀 BIG MOVES", bm_df, cols, "TICKER | PRICE   | GAIN% | VOL M"))
 
-        # Smart splitting (Telegram limit ~4000 chars)
-        full_msg = "\n".join(all_content)
-        if not full_msg:
-            send_telegram_message(BOT_TOKEN, CHAT_ID, "😴 No setups found today.")
-        elif len(full_msg) < 4000:
-            send_telegram_message(BOT_TOKEN, CHAT_ID, full_msg)
-        else:
-            # Simple split by sections
-            for section in all_content:
-                if len(section) < 4000:
-                    send_telegram_message(BOT_TOKEN, CHAT_ID, section)
-                else:
-                    # If a single table is too long, split by lines
-                    chunk = ""
-                    for line in section.split("\n"):
-                        if len(chunk) + len(line) > 3900:
-                            send_telegram_message(BOT_TOKEN, CHAT_ID, chunk + "</pre>")
-                            chunk = "<pre>"
-                        chunk += line + "\n"
-                    send_telegram_message(BOT_TOKEN, CHAT_ID, chunk)
+            # 2. Smart results dispatch
+            if not all_content:
+                send_telegram_message(BOT_TOKEN, CHAT_ID, f"✅ <b>Screener Finished</b>\nProcessed {num_tickers} stocks.\nResult: 😴 No setups found today.")
+            else:
+                for section in all_content:
+                    if len(section) < 4000:
+                        send_telegram_message(BOT_TOKEN, CHAT_ID, section)
+                    else:
+                        chunk = ""
+                        for line in section.split("\n"):
+                            if len(chunk) + len(line) > 3900:
+                                send_telegram_message(BOT_TOKEN, CHAT_ID, chunk + "</pre>")
+                                chunk = "<pre>"
+                            chunk += line + "\n"
+                        send_telegram_message(BOT_TOKEN, CHAT_ID, chunk)
+                
+                duration = (datetime.datetime.now() - start_time).seconds // 60
+                send_telegram_message(BOT_TOKEN, CHAT_ID, f"✅ <b>Screener Complete</b>\nTotal: {num_tickers} stocks\nDuration: {duration} mins")
+                
+        except Exception as e:
+            send_telegram_message(BOT_TOKEN, CHAT_ID, f"❌ <b>Screener Crashed</b>\nError: {str(e)}")
