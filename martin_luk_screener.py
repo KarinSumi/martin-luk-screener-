@@ -126,9 +126,18 @@ if __name__ == "__main__":
     if not BOT_TOKEN or not CHAT_ID:
         print("Missing Credentials.")
     else:
-        # 1. Send "Started" heartbeat
+        # 1. Send "Started" heartbeat with Legend
+        legend = (
+            "📖 <b>Legend:</b>\n"
+            "• <b>ADR:</b> Avg Daily Range (Volatility)\n"
+            "• <b>SUPP:</b> Support Level (E9=EMA9, E21=EMA21)\n"
+            "• <b>DIST:</b> % Distance to Support\n"
+            "• <b>GAIN:</b> % Price Increase vs Prev Close\n"
+            "• <b>VOL M:</b> 20-Day Avg Dollar Volume (Millions)"
+        )
         start_time = datetime.datetime.now()
-        send_telegram_message(BOT_TOKEN, CHAT_ID, f"🚀 <b>Screener Started</b>\nTime: {start_time.strftime('%Y-%m-%d %H:%M:%S')} UTC")
+        send_telegram_message(BOT_TOKEN, CHAT_ID, 
+            f"🚀 <b>Screener Started</b>\nTime: {start_time.strftime('%Y-%m-%d %H:%M:%S')} UTC\n\n{legend}")
         
         try:
             tickers = get_full_us_watchlist()
