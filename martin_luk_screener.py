@@ -98,14 +98,91 @@ def run_multi_screener(tickers):
             
     return pd.DataFrame(pullbacks), pd.DataFrame(big_moves)
 
-def save_results_to_csv(pb_df, bm_df):
+def get_last_run_tickers():
+    """Finds the most recent prior run date and returns its tickers."""
+    prev_pb = set()
+    prev_bm = set()
+    
+    if not os.path.exists("results"):
+        return prev_pb, prev_bm
+        
+    all_dates = []
+    for root, dirs, files in os.walk("results"):
+        # We are looking for folders that contain .csv files
+        if "pullbacks.csv" in files or "big_moves.csv" in files:
+            # Extract date from path (results/YYYY/MM/DD)
+            parts = root.replace("\\", "/").split("/")
+            if len(parts) >= 4:
+                try:
+                    date_str = f"{parts[1]}-{parts[2]}-{parts[3]}"
+                    all_dates.append((date_str, root))
+                except: continue
+                
+    if not all_dates:
+        return prev_pb, prev_bm
+        
+    # Sort by date string descending
+    all_dates.sort(key=lambda x: x[0], reverse=True)
+    
+    today_str = datetime.datetime.now().strftime("%Y-%m-%d")
+    
+    # Find the first one that isn't today
+    last_run_root = None
+    for date_str, root in all_dates:
+        if date_str < today_str:
+            last_run_root = root
+            break
+            
+    if last_run_root:
+        print(f"Comparing against last run from: {last_run_root}")
+        pb_path = os.path.join(last_run_root, "pullbacks.csv")
+        bm_path = os.path.join(last_run_root, "big_moves.csv")
+        
+        if os.path.exists(pb_path):
+            try:
+                df = pd.read_csv(pb_path)
+                if not df.empty and 'Ticker' in df.columns:
+                    prev_pb = set(df['Ticker'].astype(str).tolist())
+            except: pass
+            
+        if os.path.exists(bm_path):
+            try:
+                df = pd.read_csv(bm_path)
+                if not df.empty and 'Ticker' in df.columns:
+                    prev_bm = set(df['Ticker'].astype(str).tolist())
+            except: pass
+            
+    return prev_pb, prev_bm
+
+def find_new_additions(current_pb_df, current_bm_df):
+    """Identifies tickers that were not in the previous run."""
+    prev_pb, prev_bm = get_last_run_tickers()
+    
+    current_pb = set(current_pb_df['Ticker'].astype(str).tolist()) if not current_pb_df.empty else set()
+    current_bm = set(current_bm_df['Ticker'].astype(str).tolist()) if not current_bm_df.empty else set()
+    
+    new_pb = current_pb - prev_pb
+    new_bm = current_bm - prev_bm
+    
+    new_data = []
+    # Combine and categorize
+    all_new_tickers = new_pb.union(new_bm)
+    for ticker in sorted(list(all_new_tickers)):
+        types = []
+        if ticker in new_pb: types.append("Pullback")
+        if ticker in new_bm: types.append("Big Move")
+        new_data.append({'Ticker': ticker, 'Type': " & ".join(types)})
+        
+    return pd.DataFrame(new_data)
+
+def save_results_to_csv(pb_df, bm_df, new_df):
     now = datetime.datetime.now()
     path = os.path.join("results", now.strftime("%Y"), now.strftime("%m"), now.strftime("%d"))
     os.makedirs(path, exist_ok=True)
     
-    # Save files (even if empty, to confirm run)
     pb_df.to_csv(os.path.join(path, "pullbacks.csv"), index=False)
     bm_df.to_csv(os.path.join(path, "big_moves.csv"), index=False)
+    new_df.to_csv(os.path.join(path, "new_additions.csv"), index=False)
     print(f"Results saved locally to {path}")
 
 def send_telegram_message(bot_token, chat_id, message):
@@ -155,6 +232,12 @@ if __name__ == "__main__":
             
             pb_df, bm_df = run_multi_screener(tickers)
             
+            # Find New Arrivals BEFORE saving
+            new_df = find_new_additions(pb_df, bm_df)
+            
+            # Save results (including new additions)
+            save_results_to_csv(pb_df, bm_df, new_df)
+            
             # Prepare content
             all_content = []
             if not pb_df.empty:
@@ -166,6 +249,15 @@ if __name__ == "__main__":
                 bm_df = bm_df.sort_values(by='Gain', ascending=False)
                 cols = [('Ticker', 6), ('Price', 7), ('Gain', 5), ('Vol', 5)]
                 all_content.append(format_table("🚀 BIG MOVES", bm_df, cols, "TICKER | PRICE   | GAIN% | VOL M"))
+
+            # Add New Arrivals Section
+            if not new_df.empty:
+                new_section = "🆕 <b>NEW TODAY:</b>\n"
+                for _, row in new_df.iterrows():
+                    new_section += f"• {row['Ticker']} ({row['Type']})\n"
+                all_content.append(new_section)
+            else:
+                all_content.append("🆕 <b>NEW TODAY:</b> None")
 
             # 2. Smart results dispatch
             if not all_content:
