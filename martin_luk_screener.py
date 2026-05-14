@@ -98,6 +98,16 @@ def run_multi_screener(tickers):
             
     return pd.DataFrame(pullbacks), pd.DataFrame(big_moves)
 
+def save_results_to_csv(pb_df, bm_df):
+    now = datetime.datetime.now()
+    path = os.path.join("results", now.strftime("%Y"), now.strftime("%m"), now.strftime("%d"))
+    os.makedirs(path, exist_ok=True)
+    
+    # Save files (even if empty, to confirm run)
+    pb_df.to_csv(os.path.join(path, "pullbacks.csv"), index=False)
+    bm_df.to_csv(os.path.join(path, "big_moves.csv"), index=False)
+    print(f"Results saved locally to {path}")
+
 def send_telegram_message(bot_token, chat_id, message):
     url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
     payload = {"chat_id": chat_id, "text": message, "parse_mode": "HTML"}
