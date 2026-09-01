@@ -1,92 +1,120 @@
 Ticker,Type
-ACN,Pullback
-ACRS,Pullback
-AEHL,Big Move
+ADVB,Big Move
+AGBK,Big Move
 AGRO,Big Move
-ASND,Big Move
-ASST,Big Move
-BILL,Pullback
-BMM,Big Move
-BMNR,Big Move
-BOXL,Big Move
-BTDR,Big Move
-BUUU,Big Move
-BW,Big Move
+AI,Pullback
+AMPL,Pullback
+APPN,Pullback
+ARCT,Big Move
+ASAN,Pullback
+BBNX,Pullback
+BIAF,Big Move
+BL,Pullback
+BMNR,Pullback
+BRZE,Pullback
+BTGO,Pullback
+BULL,Pullback
+BWXT,Big Move
 BZ,Pullback
-CAR,Big Move
-CHA,Big Move
-COIN,Big Move
-CRCL,Big Move
-CRWD,Big Move
-DFDV,Big Move
-DPRO,Big Move
-DXPE,Pullback
+CBIO,Big Move
+CHOW,Pullback
+CLYM,Big Move
+CNH,Big Move
+CNXC,Big Move
+COUR,Pullback
+CRK,Big Move
+CRWD,Pullback
+CUE,Big Move
+DOCS,Pullback
+DOCU,Pullback
+DUOL,Big Move
+EDRY,Big Move
 EE,Pullback
+EIX,Big Move
+FCUV,Big Move
 FGI,Pullback
+FGL,Big Move
 FIG,Pullback
 FIGS,Pullback
+FIVN,Pullback
 FLOC,Pullback
-FWDI,Big Move
-FWRG,Pullback
-FXHO,Big Move
-GFUZ,Big Move
-GLXY,Big Move
+FRHC,Pullback
+FRSH,Pullback
+FRVO,Big Move
+FTH,Big Move
+FTNT,Pullback
+GENB,Pullback
+GH,Pullback
+GMRS,Big Move
 GO,Pullback
-GPRK,Big Move
-GRRR,Pullback
-HELE,Big Move
+GTM,Pullback
+GWRE,Pullback
+HCWC,Big Move
 HELP,Pullback
-HNGE,Big Move
+HNST,Pullback
+HP,Big Move
 HRTG,Pullback
-HTFL,Big Move
+HUBS,Pullback
 HUIZ,Pullback
-HVII,Big Move
+IMMX,Pullback
+INTA,Pullback
+IPI,Big Move
 JMIA,Pullback
-LIFE,Pullback
+KD,Pullback
+KLRA,Big Move
+LMB,Big Move
 LUCY,Pullback
-METC,Big Move
-MF,Big Move
+MDB,Pullback
+MGRT,Big Move
 MLAB,Pullback
+MMED,Big Move
+MNDY,Pullback
+MNPR,Big Move
 MNTN,Pullback
-MRVI,Pullback
-NAVN,Pullback
-NCT,Big Move
-NGL,Big Move
+MOVE,Big Move
+MRNA,Big Move
+MSTR,Pullback
+NCNO,Pullback
+NEO,Pullback
 NIQ,Pullback
-NU,Pullback
-NXE,Pullback
-OMCL,Big Move
-PAVS,Big Move
+NVAX,Big Move
+NVS,Big Move
+NXTC,Big Move
+OBE,Big Move
+OCTV,Pullback
+ORA,Big Move
+PBR,Big Move
+PCG,Big Move
 PCOR,Pullback
-PICS,Big Move
-PLSE,Big Move
-PRCT,Pullback
+PLTR,Pullback
 PSKY,Pullback
 PSNL,Pullback
-PURR,Big Move
-QMCO,Big Move
-QNST,Pullback
-RBLX,Big Move
-RDVT,Pullback
-SBET,Big Move
-SIF,Big Move
-SNDK,Big Move
-SPAI,Big Move
-SUJA,Big Move
-SUPV,Big Move
-SWKS,Pullback
-TITN,Big Move
-TSLA,Big Move
+PURR,Pullback
+RCUS,Pullback
+RDAC,Big Move
+RFAI,Pullback
+RGEN,Pullback
+RSKD,Pullback
+SAIL,Pullback
+SBET,Pullback
+SDGR,Big Move
+SEB,Big Move
+SGRY,Big Move
+SION,Big Move
+SLN,Big Move
+SNDK,Pullback
+TBN,Big Move
+TH,Pullback
 TTAN,Pullback
+VERX,Pullback
 VIA,Pullback
-VRNS,Pullback
+VIR,Big Move
+VSTM,Big Move
 VYX,Pullback
 WDAY,Pullback
-WOLF,Big Move
-WTI,Pullback
-WYFI,Big Move
-XE,Big Move
+WETO,Big Move
+WK,Pullback
 XMTR,Pullback
 XNCR,Pullback
-XPRO,Pullback
+XPON,Pullback
 ZBIO,Pullback
