@@ -1,68 +1,378 @@
 Ticker,Type
+AAP,Big Move
+AAUC,Big Move
+ABCL,Pullback
 ABTC,Big Move
-AEMD,Pullback
-AFRM,Pullback
-AGBK,Big Move
+ABVX,Big Move
+ACET,Big Move
+ADSK,Big Move
+AEM,Big Move
+AFRM,Pullback & Big Move
+AG,Big Move
+AGYS,Big Move
+AJG,Big Move
+ALGT,Big Move
+ALLT,Big Move
+ALMR,Big Move
+ALOY,Big Move
+AMN,Big Move
+AMTM,Big Move
+ANGI,Big Move
+ANL,Big Move
+APP,Big Move
+APPF,Big Move
+APPN,Big Move
+APPS,Big Move
+ARHS,Big Move
+ARIS,Big Move
+ARLO,Big Move
+ARQT,Big Move
+ARXS,Big Move
+ASA,Big Move
+ASAN,Big Move
+ASM,Big Move
 ASTH,Pullback
+ASTS,Big Move
 ATEC,Pullback
+ATEX,Pullback
 ATRC,Pullback
 AUGO,Pullback
+AUR,Big Move
+AVEX,Big Move
+AVPT,Big Move
+AZO,Big Move
+BAFN,Big Move
+BB,Pullback & Big Move
+BBWI,Big Move
+BBY,Big Move
+BC,Big Move
+BETA,Big Move
+BETR,Big Move
 BH,Big Move
+BHC,Big Move
+BILL,Big Move
+BIRK,Big Move
+BLDR,Big Move
+BLKB,Big Move
 BLMN,Big Move
-BMBL,Big Move
-CDW,Big Move
-CLS,Pullback
-CNXC,Big Move
-CRSR,Big Move
-CVI,Big Move
-DDOG,Pullback
-DLXY,Pullback
-EDHL,Big Move
-EFXT,Big Move
-FTK,Big Move
-FWRG,Big Move
-GCT,Pullback
-GFR,Big Move
-GOSS,Big Move
-GPRE,Big Move
-GRNT,Big Move
-GTLB,Pullback
-HIMS,Pullback
+BNED,Big Move
+BOBS,Big Move
+BOOT,Big Move
+BORR,Pullback
+BRCB,Big Move
+BRZE,Big Move
+BYND,Big Move
+CAL,Big Move
+CAPR,Big Move
+CAVA,Big Move
+CBRE,Big Move
+CBRL,Big Move
+CCOI,Big Move
+CCSI,Big Move
+CD,Big Move
+CGNT,Big Move
+CHPT,Big Move
+CHRN,Big Move
+CIGI,Big Move
+CLBT,Big Move
+CLOV,Pullback
+CLYM,Big Move
+COAG,Big Move
+COIN,Big Move
+COLM,Big Move
+COMP,Big Move
+CORZ,Big Move
+COUR,Big Move
+CPRI,Big Move
+CPRT,Big Move
+CRCL,Big Move
+CRL,Pullback
+CRML,Big Move
+CRNC,Big Move
+CROX,Big Move
+CRTO,Big Move
+CRVS,Big Move
+CRWV,Big Move
+CSGP,Big Move
+CTSH,Big Move
+CVCO,Big Move
+CWK,Big Move
+CWST,Big Move
+CX,Big Move
+CYPH,Pullback
+DBI,Big Move
+DC,Big Move
+DDS,Pullback
+DFH,Big Move
+DIN,Big Move
+DINO,Pullback
+DK,Pullback
+DMRC,Big Move
+DOCS,Big Move
+DOO,Big Move
+DRUG,Big Move
+DSGN,Big Move
+DUOL,Big Move
+DXC,Big Move
+DXCM,Big Move
+EBAY,Big Move
+ECO,Pullback
+EFX,Big Move
+EGO,Big Move
+EIKN,Big Move
+EL,Big Move
+ELE,Big Move
+ELF,Big Move
+ENPH,Big Move
+EPAM,Big Move
+EQPT,Big Move
+EQX,Big Move
+ERIC,Big Move
+ESLT,Big Move
+ESTA,Big Move
+ESTC,Big Move
+ETSY,Big Move
+EXK,Big Move
+EXPE,Big Move
+FA,Big Move
+FDMT,Big Move
+FIG,Big Move
+FIGR,Big Move
+FIVN,Big Move
+FLYW,Big Move
+FNKO,Big Move
+FOXF,Big Move
+FTRE,Big Move
+FWDI,Big Move
+G,Big Move
+GBFH,Big Move
+GENI,Big Move
+GIBO,Big Move
+GKOS,Pullback
+GLOB,Big Move
+GPI,Big Move
+GTLB,Big Move
+GWRE,Big Move
+H,Big Move
+HELP,Big Move
+HIMS,Big Move
+HLIT,Big Move
+HOV,Big Move
+HROW,Big Move
+HSLV,Big Move
+HUBS,Big Move
+HYMC,Big Move
+IBTA,Big Move
+IE,Big Move
+IMUX,Big Move
+INBX,Big Move
 INFY,Big Move
+INOD,Big Move
+INTA,Big Move
+INTR,Pullback
+INTU,Big Move
+IONQ,Big Move
+IP,Big Move
 IRLA,Big Move
-JLHL,Big Move
-KOD,Pullback
-LIFE,Big Move
+IT,Big Move
+JACK,Big Move
+JHX,Big Move
+JLL,Big Move
+JMIA,Big Move
+KD,Big Move
+KGC,Big Move
+KLRA,Big Move
+KMTS,Big Move
+KMX,Big Move
+KOD,Pullback & Big Move
+KPLT,Big Move
+KRMN,Big Move
+KSS,Big Move
+KVYO,Big Move
+KYTX,Big Move
+KZIA,Big Move
+LBRX,Big Move
+LCII,Big Move
+LE,Big Move
+LEN,Big Move
+LEU,Big Move
+LEVI,Big Move
+LFTO,Big Move
+LIND,Pullback
+LSPD,Big Move
+LTBR,Big Move
+LULU,Big Move
+M,Big Move
+MAAS,Big Move
+MAGN,Big Move
+MAX,Big Move
+MAZE,Pullback
+MBC,Big Move
+MBUU,Big Move
+MGPI,Big Move
+MGTX,Big Move
+MH,Big Move
+MITK,Big Move
+MMED,Big Move
+MMYT,Big Move
+MNDY,Big Move
+MNRO,Big Move
+MNTN,Big Move
+MRVI,Big Move
+MSTR,Big Move
 MTW,Pullback
-NOVT,Pullback
-NSIT,Big Move
+NAVN,Big Move
+NCNO,Big Move
+NEWP,Big Move
+NG,Big Move
+NGNE,Big Move
+NKE,Big Move
+NOW,Big Move
+NRDS,Big Move
+NRIX,Big Move
+NRXS,Big Move
+NTSK,Pullback
+NVCT,Big Move
+NWL,Big Move
+NX,Big Move
+NXE,Big Move
+ODD,Big Move
+ODTX,Big Move
 OKTA,Pullback
-PARR,Big Move
-PBF,Big Move
+OLB,Pullback
+ONC,Big Move
+ONEW,Big Move
+ONIT,Big Move
+OPI,Big Move
+OPRX,Big Move
+OR,Big Move
+ORIC,Big Move
+OSCR,Pullback
+OXM,Big Move
+PACS,Big Move
+PAG,Big Move
+PAR,Big Move
+PATK,Big Move
+PAYC,Big Move
 PCVX,Pullback
+PDSB,Pullback
+PEGA,Big Move
+PFSI,Big Move
+PGY,Big Move
+PII,Big Move
+PLAY,Big Move
+PLNT,Big Move
+POOL,Big Move
+PPTA,Big Move
+PRCH,Big Move
+PRGS,Big Move
 PSIX,Big Move
-PWP,Pullback
-PXS,Big Move
-QDEL,Big Move
-QNME,Pullback
+PTON,Big Move
+QBTS,Big Move
+QNT,Big Move
+QSI,Pullback
+QUBT,Big Move
+QURE,Big Move
+QXO,Big Move
+RBLX,Big Move
+RDDT,Big Move
+REAL,Big Move
+REAX,Big Move
 RGC,Big Move
-SEI,Pullback
-SHLS,Pullback
-SID,Pullback
-SMXT,Big Move
-SNOW,Pullback
-SUJA,Big Move
-SUPX,Big Move
+RGTI,Big Move
+RH,Big Move
+RKT,Big Move
+RNG,Big Move
+ROCK,Big Move
+RPD,Big Move
+RRGB,Big Move
+RSKD,Big Move
+RVLV,Big Move
+RYAN,Big Move
+SAH,Big Move
+SARO,Big Move
+SBH,Big Move
+SBSW,Big Move
+SECZ,Big Move
+SEZL,Big Move
+SGHT,Big Move
+SGMT,Big Move
+SIG,Big Move
+SITE,Big Move
+SKE,Big Move
+SKY,Big Move
+SLDB,Big Move
+SMG,Big Move
+SMR,Big Move
+SMWB,Big Move
+SNAP,Big Move
+SOFI,Big Move
+SPRB,Big Move
+SPTX,Big Move
+SRPT,Big Move
+SRZN,Big Move
+STLN,Big Move
+STNE,Pullback
+STOK,Big Move
+STRO,Big Move
+SVC,Big Move
+SVRN,Pullback
+SVV,Big Move
 TBCH,Big Move
-TTMI,Big Move
-U,Pullback
-VEEA,Big Move
-VERX,Pullback
-VG,Big Move
-VIA,Pullback
-VICR,Pullback
+TDAY,Pullback
+TEAM,Big Move
+TEN,Pullback
+TENB,Pullback
+THO,Big Move
+TLN,Pullback
+TOST,Big Move
+TREE,Big Move
+TRIP,Big Move
+TRU,Big Move
+TSAT,Big Move
+TTD,Big Move
+UEC,Big Move
+UNIT,Big Move
+UPBD,Big Move
+UPST,Big Move
+USAR,Big Move
+VAC,Big Move
+VEEA,Pullback
+VEEE,Big Move
+VEEV,Big Move
+VELO,Big Move
+VERA,Big Move
+VERX,Big Move
+VIA,Big Move
+VKTX,Big Move
+VLO,Pullback
 VNCE,Big Move
-VRNS,Pullback & Big Move
-WFCF,Big Move
+VRDN,Big Move
+VSTM,Big Move
+VYX,Big Move
+W,Big Move
+WAY,Big Move
+WCN,Big Move
+WEST,Big Move
+WGO,Big Move
+WINA,Big Move
+WING,Big Move
+WIX,Big Move
+WK,Big Move
+WLTH,Big Move
+WMG,Big Move
+WOLF,Big Move
+WPP,Big Move
+WULF,Big Move
+WWW,Big Move
 XERS,Pullback
-XXI,Pullback
+XP,Pullback
+XRPN,Big Move
+XYZ,Big Move
+XZO,Big Move
+YARW,Big Move
+YDES,Big Move
+YSWY,Big Move
+Z,Big Move
+ZG,Big Move
+ZS,Pullback
